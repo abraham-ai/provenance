@@ -1,0 +1,9 @@
+type MintEvent @entity {
+  id: ID!
+  mint: Mint!
+  event: Event!
+  mintId: ID!
+  eventId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
