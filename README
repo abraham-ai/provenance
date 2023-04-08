@@ -1,0 +1,7 @@
+# Setup
+
+## Contracts
+
+```
+cd contracts
+foundryup
