@@ -1,16 +1,23 @@
 {
-  "name": "eden-subgraph",
-  "license": "UNLICENSED",
+  "name": "eden-subgraph-local",
+  "license": "MIT",
   "scripts": {
+    "refresh-local": "node src/scripts/getAbis.js && node src/scripts/getDeployments.js",
+    "prep": "node src/scripts/prepare.js",
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ eden-subgraph",
-    "create-local": "graph create --node http://localhost:8020/ eden-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ eden-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 eden-subgraph"
+    "create-local": "graph create --node http://localhost:8020/ eden-subgraph-local",
+    "remove-local": "graph remove --node http://localhost:8020/ eden-subgraph-local",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 eden-subgraph-local"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.29.2",
-    "@graphprotocol/graph-ts": "0.26.0"
+    "@graphprotocol/graph-cli": "^0.33.0",
+    "@graphprotocol/graph-ts": "^0.27.0",
+    "mustache": "^4.0.1"
+  },
+  "devDependencies": {
+    "fs": "^0.0.1-security",
+    "js-yaml": "^4.1.0"
   }
 }

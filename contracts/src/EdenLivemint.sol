@@ -22,8 +22,8 @@ contract EdenLivemint is IEdenLivemint, ERC721, ERC721URIStorage, Ownable {
 
     function mint() public {
         _safeMint(msg.sender, currentTokenId);
-        currentTokenId++;
         emit Mint(msg.sender, currentTokenId);
+        currentTokenId++;
     }
 
     function setMetadataModifierAddress(address _metadataModifierAddress) public onlyOwner {

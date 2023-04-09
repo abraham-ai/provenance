@@ -1,5 +1,9 @@
 # Setup
 
+## Install Rust, Foundry, Forge
+
+https://book.getfoundry.sh/getting-started/installation
+
 ## Contracts
 
 Installation:
@@ -15,3 +19,26 @@ forge test
 
 ```
 git clone https://github.com/abraham-ai/graph-node.git
+cd graph-node/docker
+docker compose up
+```
+
+There should now be a local `anvil` blockchain running on localhost:8547, and a local graph node.
+
+## Deploy Contracts To Local Blockchain
+
+```
+cd contracts
+forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8547
+```
+
+## Deploy Local Subgraph
+
+```
+cd eden-subgraph
+yarn
+yarn refresh-local
+yarn prep 1337
+yarn create-local
+yarn deploy-local
+```

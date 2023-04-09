@@ -1,9 +1,13 @@
-type MintEvent @entity {
+type LivemintToken @entity {
   id: ID!
-  mint: Mint!
-  event: Event!
-  mintId: ID!
-  eventId: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  tokenId: BigInt!
+}
+
+type MintEvent @entity {
+  id: Bytes!
+  timestamp: BigInt!
+  txHash: Bytes!
+
+  caller: Bytes!
+  tokenId: BigInt!
 }
