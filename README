@@ -45,3 +45,7 @@ yarn prep 1337
 yarn create-local
 yarn deploy-local
 ```
+
+Now, navigate to http://localhost:8000/subgraphs/name/eden-subgraph-local/graphql?query=query+%7B%0A++mintEvents+%7B%0A++++id%0A++%7D%0A%7D
+
+Running this query should show a single mint event.
