@@ -12,6 +12,7 @@ Installation:
 cd contracts
 foundryup
 pnpm i
+forge install
 forge test
 ```
 
