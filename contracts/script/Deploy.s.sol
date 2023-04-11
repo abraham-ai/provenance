@@ -6,6 +6,7 @@ import { EdenLivemint } from "../src/EdenLivemint.sol";
 
 contract Deploy is Script {
     address internal deployer;
+    address internal metadataModifier = vm.envAddress("METADATA_MODIFIER");
     EdenLivemint internal _edenLivemint;
 
     function setUp() public virtual {
@@ -15,8 +16,7 @@ contract Deploy is Script {
 
     function run() public {
         vm.startBroadcast(deployer);
-        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", address(0));
-        _edenLivemint.mint();
+        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", metadataModifier);
         vm.stopBroadcast();
     }
 }

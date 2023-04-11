@@ -48,4 +48,27 @@ yarn deploy-local
 
 Now, navigate to http://localhost:8000/subgraphs/name/eden-subgraph-local/graphql?query=query+%7B%0A++mintEvents+%7B%0A++++id%0A++%7D%0A%7D
 
-Running this query should show a single mint event.
+## Start Mongo
+```
+docker compose up
+```
+
+## Start Watcher scripts
+cd watcher
+pnpm i
+node watch.js
+node modiify.js
+```
+
+The watcher script queries the subgraph every so often to look for new mint events and writes them to db
+
+The modify script queries the db for unacknowledged mint events, and updates their token URI with a backend signer.
+
+## Start the Frontend
+```
+cd frontend
+yarn install
+yarn dev
+```
+
+Navigate to http://localhost:3000. There should already be a wallet connected. Click 'Claim Token'. If all goes well, the token should be minted, the mint is written to the subgraph, the watcher writes the mint to the db, and the modifier will update the metadata.
