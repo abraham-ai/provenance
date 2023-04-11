@@ -21,6 +21,7 @@ forge test
 ```
 git clone https://github.com/abraham-ai/graph-node.git
 cd graph-node/docker
+export MNEMONIC="test test test test test test test test test test test junk"
 docker compose up
 ```
 
@@ -30,6 +31,7 @@ There should now be a local `anvil` blockchain running on localhost:8547, and a 
 
 ```
 cd contracts
+cp .env.example .env
 forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8547
 ```
 
