@@ -15,6 +15,7 @@ contract Deploy is Script {
 
     function run() public {
         vm.startBroadcast(deployer);
+        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", address(0));
         _edenLivemint.mint();
         vm.stopBroadcast();
     }
