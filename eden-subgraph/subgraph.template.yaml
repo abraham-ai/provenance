@@ -16,6 +16,7 @@ dataSources:
         # - Approval
         # - ApprovalForAll
         - Mint
+        - MetadataUpdate
         # - OwnershipTransferred
         # - Transfer
       abis:
@@ -28,6 +29,8 @@ dataSources:
         #   handler: handleApprovalForAll
         - event: Mint(indexed address,indexed uint256)
           handler: handleMint
+        - event: MetadataUpdate(indexed uint256)
+          handler: handleMetadataUpdate
         # - event: OwnershipTransferred(indexed address,indexed address)
         #   handler: handleOwnershipTransferred
         # - event: Transfer(indexed address,indexed address,indexed uint256)

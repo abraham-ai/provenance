@@ -4,20 +4,24 @@ pragma solidity >=0.8.0 <0.9.0;
 import { Script } from "forge-std/Script.sol";
 import { EdenLivemint } from "../src/EdenLivemint.sol";
 
-contract Deploy is Script {
+contract MetadataUpdateEvent is Script {
     address internal deployer;
-    address internal metadataModifier = vm.envAddress("METADATA_MODIFIER");
-    string internal _baseURI = "https://gateway.pinata.cloud/ipfs/Qmde91C6FZNdumShjuhH9G2UeJkfoYqEuNgesW8EErUsgZ/";
+    address internal _edenLivemintAddress = vm.envAddress("EDEN_LIVEMINT_ADDRESS");
     EdenLivemint internal _edenLivemint;
+
+    constructor() {
+        setUp();
+    }
 
     function setUp() public virtual {
         string memory mnemonic = vm.envString("MNEMONIC");
         (deployer, ) = deriveRememberKey(mnemonic, 0);
+        _edenLivemint = EdenLivemint(_edenLivemintAddress);
     }
 
     function run() public {
         vm.startBroadcast(deployer);
-        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", metadataModifier, _baseURI);
+        _edenLivemint.setMetadata(0);
         vm.stopBroadcast();
     }
 }

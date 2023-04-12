@@ -2,16 +2,20 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import { ERC721URIStorage } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { IEdenLivemint } from "./IEdenLivemint.sol";
+import { console2 } from "forge-std/console2.sol";
 
-contract EdenLivemint is IEdenLivemint, ERC721, ERC721URIStorage, Ownable {
+contract EdenLivemint is IEdenLivemint, ERC721, Ownable {
     address public metadataModifierAddress;
+    string public baseURI;
     uint256 public currentTokenId;
+    mapping(uint256 => bool) public hasMetadata;
 
-    constructor(string memory _name, string memory _symbol, address _metadataModifierAddress) ERC721(_name, _symbol) {
+    constructor(string memory _name, string memory _symbol, address _metadataModifierAddress, string memory _myBaseURI) ERC721(_name, _symbol) {
         metadataModifierAddress = _metadataModifierAddress;
+        baseURI = _myBaseURI;
         currentTokenId = 0;
     }
 
@@ -30,15 +34,16 @@ contract EdenLivemint is IEdenLivemint, ERC721, ERC721URIStorage, Ownable {
         metadataModifierAddress = _metadataModifierAddress;
     }
 
-    function setTokenURI(uint256 _tokenId, string memory _tokenURI) public onlyMetadataModifier {
-        _setTokenURI(_tokenId, _tokenURI);
+    function setMetadata(uint256 _tokenId) public onlyMetadataModifier {
+        hasMetadata[_tokenId] = true;
+        emit MetadataUpdate(_tokenId);
     }
 
-    function _burn(uint256 _tokenId) internal override(ERC721, ERC721URIStorage) {
-        super._burn(_tokenId);
-    }
-
-    function tokenURI(uint256 _tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
-        return super.tokenURI(_tokenId);
+    function tokenURI(uint256 _tokenId) public view override(ERC721) returns (string memory) {
+        if (hasMetadata[_tokenId]) {
+            return string(abi.encodePacked(baseURI, Strings.toString(_tokenId), '.json'));
+        } else {
+            return string(abi.encodePacked(baseURI, 'base.json'));
+        }
     }
 }

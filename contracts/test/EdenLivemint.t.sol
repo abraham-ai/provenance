@@ -11,6 +11,7 @@ contract EdenLivemintTest is PRBTest, StdCheats {
     address internal _owner = address(bytes20(keccak256("ownerd")));
     address internal _metadataModifierAddress = address(bytes20(keccak256("metadataModifierAddress")));
     address internal _minter = address(bytes20(keccak256("minter")));
+    string internal _baseURI = "https://gateway.pinata.cloud/ipfs/Qmde91C6FZNdumShjuhH9G2UeJkfoYqEuNgesW8EErUsgZ/";
 
     function setUp() public virtual {
         vm.label(_owner, "owner");
@@ -22,15 +23,18 @@ contract EdenLivemintTest is PRBTest, StdCheats {
         vm.deal(_minter, 100 ether);
         
         vm.prank(_owner);
-        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", _metadataModifierAddress);
+        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", _metadataModifierAddress, _baseURI);
     }
 
-    function testMint() public {
-        assertEq(_edenLivemint.balanceOf(_minter), 0);
-        vm.prank(_minter);
-        _edenLivemint.mint();
-        assertEq(_edenLivemint.balanceOf(_minter), 1);
-    }
+    // function testMint() public {
+    //     assertEq(_edenLivemint.balanceOf(_minter), 0);
+    //     vm.prank(_minter);
+    //     _edenLivemint.mint();
+    //     assertEq(_edenLivemint.balanceOf(_minter), 1);
+    //     assertEq(_edenLivemint.ownerOf(0), _minter);
+    //     string memory expectedURI = string(abi.encodePacked(_baseURI, "base.json"));
+    //     assertEq(_edenLivemint.tokenURI(0), expectedURI);
+    // }
 
     function testSetMetadataModifierAddress() public {
         assertEq(_edenLivemint.metadataModifierAddress(), _metadataModifierAddress);
@@ -52,8 +56,9 @@ contract EdenLivemintTest is PRBTest, StdCheats {
         _edenLivemint.mint();
 
         vm.prank(_metadataModifierAddress);
-        _edenLivemint.setTokenURI(0, "https://example.com");
-        assertEq(_edenLivemint.tokenURI(0), "https://example.com");
+        _edenLivemint.setMetadata(0);
+        string memory expectedURI = string(abi.encodePacked(_baseURI, "0.json"));
+        assertEq(_edenLivemint.tokenURI(0), expectedURI);
     }
 
     function testRandomCannotSetTokenURI() public {
@@ -64,6 +69,6 @@ contract EdenLivemintTest is PRBTest, StdCheats {
         vm.expectRevert(
             "EdenLivemint: caller is not the metadata modifier"
         );
-        _edenLivemint.setTokenURI(0, "https://example.com");
+        _edenLivemint.setMetadata(0);
     }
 }

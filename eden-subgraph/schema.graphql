@@ -1,9 +1,19 @@
 type LivemintToken @entity {
   id: ID!
   tokenId: BigInt!
+  tokenURI: String!
 }
 
 type MintEvent @entity {
+  id: Bytes!
+  timestamp: BigInt!
+  txHash: Bytes!
+
+  caller: Bytes!
+  tokenId: BigInt!
+}
+
+type MetadataUpdateEvent @entity {
   id: Bytes!
   timestamp: BigInt!
   txHash: Bytes!
