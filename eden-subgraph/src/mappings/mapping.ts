@@ -24,6 +24,7 @@ export function handleMint(event: Mint): void {
     if (livemintToken) {
       livemintToken.tokenId = event.params._tokenId;
       livemintToken.tokenURI = edenLivemint.tokenURI(event.params._tokenId);
+      livemintToken.owner = event.transaction.from;
       livemintToken.save();
     }
   }

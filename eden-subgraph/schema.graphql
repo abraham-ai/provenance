@@ -2,6 +2,7 @@ type LivemintToken @entity {
   id: ID!
   tokenId: BigInt!
   tokenURI: String!
+  owner: Bytes!
 }
 
 type MintEvent @entity {
