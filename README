@@ -40,10 +40,7 @@ forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8547
 ```
 cd eden-subgraph
 yarn
-yarn refresh-local
-yarn prep 1337
-yarn create-local
-yarn deploy-local
+yarn refresh-local && yarn prep 1337 && yarn create-local && yarn deploy-local
 ```
 
 Now, navigate to http://localhost:8000/subgraphs/name/eden-subgraph-local/graphql?query=query+%7B%0A++mintEvents+%7B%0A++++id%0A++%7D%0A%7D
@@ -54,6 +51,14 @@ docker compose up
 ```
 
 ## Start Watcher scripts
+
+```
+cp .env.example .env
+```
+
+Fill out the appropriate values in the env file
+
+```
 cd watcher
 pnpm i
 node watch.js
@@ -65,9 +70,16 @@ The watcher script queries the subgraph every so often to look for new mint even
 The modify script queries the db for unacknowledged mint events, and updates their token URI with a backend signer.
 
 ## Start the Frontend
+
+```
+cp .env.example .env
+```
+
+Fill out the appropriate values in the env file
+
 ```
 cd frontend
-yarn install
+yarn
 yarn dev
 ```
 
