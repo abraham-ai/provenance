@@ -3,10 +3,12 @@ const ethers = require("ethers");
 require("dotenv").config();
 const fs = require("fs");
 
-const uri = "mongodb://eden:eden@localhost:27017/eden";
-const dbName = "eden";
-const collectionName = "livemints";
-const interval = 5000; // 5 seconds
+const uri = process.env.MONGO_URL;
+const dbName = process.env.MONGO_DB_NAME;
+const collectionName = process.env.MONGO_COLLECTION_NAME;
+const interval = 10000; // 5 seconds
+const edenApiKey = process.env.EDEN_API_KEY;
+const edenApiSecret = process.env.EDEN_API_SECRET;
 
 const LivemintAbi = require("../contracts/out/EdenLivemint.sol/EdenLivemint.json");
 
@@ -39,25 +41,78 @@ const getContract = (provider) => {
 };
 
 const modifyMetadata = async (livemint, tokenId) => {
-  const newTokenURI = "https://ipfs.io/ip";
-  const tx = await livemint.setTokenURI(tokenId, newTokenURI, {
+  console.log("modifying metadata for tokenId", tokenId);
+  const tx = await livemint.setMetadata(tokenId, {
     gasLimit: 10000000,
   });
+  console.log("submitting tx", tx.hash);
   const receipt = await tx.wait();
-  console.log("receipt", receipt);
+  const isSuccess = receipt.status === 1;
+  console.log("tx success", isSuccess);
+  return isSuccess;
 };
 
-// Function to query the collection for mint events with ack = false
 const main = async () => {
   const PROVIDER_URL = process.env.PROVIDER_URL;
   const provider = ethers.getDefaultProvider(PROVIDER_URL);
   const Livemint = getContract(provider);
+
+  const edenSdk = await import("eden-sdk");
+  const { EdenClient } = edenSdk;
+  const edenClient = new EdenClient(edenApiKey, edenApiSecret);
 
   const clientMongo = new MongoClient(uri);
   await clientMongo.connect();
 
   const db = clientMongo.db(dbName);
   const collection = db.collection(collectionName);
+
+  const failureUpdate = async (taskId) => {
+    const filter = { taskId: taskId };
+    const update = { $set: { ack: true, edenSuccess: false } };
+    const options = { upsert: true };
+    await collection.updateMany(filter, update, options);
+  };
+
+  const txUpdate = async (taskId, txSuccess, imageUri) => {
+    const filter = { taskId: taskId };
+    const update = {
+      $set: {
+        ack: true,
+        edenSuccess: true,
+        imageUri: imageUri,
+        txSuccess,
+      },
+    };
+    const options = { upsert: true };
+    await collection.updateMany(filter, update, options);
+  };
+
+  const handleEdenResults = async (mints) => {
+    const taskIds = mints.map((mintEvent) => mintEvent.taskId);
+    try {
+      const { tasks } = await edenClient.getTasks({ taskIds: taskIds });
+      let creationIds = [];
+      tasks.forEach(async (task, idx) => {
+        if (task.status === "failed") {
+          await failureUpdate(task.taskId);
+        }
+        if (task.status === "completed") {
+          const creation = await edenClient.getCreation(task.creation);
+          const imageUri = creation.uri;
+          const tokenId = mints[idx].tokenId;
+          console.log("For tokenId", tokenId, "imageUri is", imageUri);
+          const txSuccess = await modifyMetadata(Livemint, tokenId);
+          console.log(task.taskId, txSuccess, imageUri);
+          await txUpdate(task.taskId, txSuccess, imageUri);
+        }
+      });
+      return creationIds;
+    } catch (error) {
+      console.error("Error fetching Eden results:", error);
+      return;
+    }
+  };
 
   async function fetchUnacknowledgedMintEvents() {
     try {
@@ -71,22 +126,7 @@ const main = async () => {
 
       console.log(`Found ${result.length} unacknowledged MintEvent(s)`);
 
-      result.forEach(async (mintEvent) => {
-        // Modify metadata
-        console.log("Modifying metadata for MintEvent with ID:", mintEvent.id);
-        const tokenId = mintEvent.tokenId;
-        await modifyMetadata(Livemint, tokenId);
-
-        // Update ack to true
-        console.log(
-          "Updating ack to true for MintEvent with ID:",
-          mintEvent.id
-        );
-        const filter = { id: mintEvent.id };
-        const update = { $set: { ack: true } };
-        const options = { upsert: true };
-        collection.updateMany(filter, update, options);
-      });
+      await handleEdenResults(result);
 
       return result;
     } catch (error) {

@@ -62,17 +62,12 @@ const main = async () => {
           const edenConfig = {
             text_input: "Cyberpunk NFT",
           };
-          const taskId = await edenClient.startTask("create", edenConfig);
-          console.log("eden task id: ", taskId);
-          mintEvent.taskId = taskId;
+          const result = await edenClient.startTask("create", edenConfig);
+          console.log("eden task id: ", result.taskId);
+          mintEvent.taskId = result.taskId;
+
+          await collection.insertOne(mintEvent);
         });
-
-        // Insert new MintEvents into MongoDB
-        console.log(
-          `Inserting ${newMintEvents.length} new MintEvent(s) into MongoDB...`
-        );
-
-        await collection.insertMany(newMintEvents);
 
         // Update startBlock
         const mostRecentMintEvent = newMintEvents.reduce((a, b) =>
