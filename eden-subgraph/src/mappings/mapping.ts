@@ -13,7 +13,7 @@ export function handleMint(event: Mint): void {
   const edenLivemint = EdenLivemint.bind(event.address);
   let mintEvent = new MintEvent(event.transaction.hash);
   if (mintEvent) {
-    mintEvent.timestamp = event.block.number;
+    mintEvent.block = event.block.number;
     mintEvent.txHash = event.transaction.hash;
     mintEvent.caller = event.transaction.from;
     mintEvent.tokenId = event.params._tokenId;
@@ -34,7 +34,7 @@ export function handleMetadataUpdate(event: MetadataUpdate): void {
   const edenLivemint = EdenLivemint.bind(event.address);
   let metadataUpdateEvent = new MetadataUpdateEvent(event.transaction.hash);
   if (metadataUpdateEvent) {
-    metadataUpdateEvent.timestamp = event.block.number;
+    metadataUpdateEvent.block = event.block.number;
     metadataUpdateEvent.txHash = event.transaction.hash;
     metadataUpdateEvent.caller = event.transaction.from;
     metadataUpdateEvent.tokenId = event.params._tokenId;

@@ -2,6 +2,7 @@ const { MongoClient } = require("mongodb");
 const ethers = require("ethers");
 require("dotenv").config();
 const fs = require("fs");
+const pinataSDK = require("@pinata/sdk");
 
 const uri = process.env.MONGO_URL;
 const dbName = process.env.MONGO_DB_NAME;
@@ -9,6 +10,8 @@ const collectionName = process.env.MONGO_COLLECTION_NAME;
 const interval = 10000; // 5 seconds
 const edenApiKey = process.env.EDEN_API_KEY;
 const edenApiSecret = process.env.EDEN_API_SECRET;
+const pinataApiKey = process.env.PINATA_API_KEY;
+const pinataApiSecret = process.env.PINATA_API_SECRET;
 
 const LivemintAbi = require("../contracts/out/EdenLivemint.sol/EdenLivemint.json");
 
@@ -40,9 +43,9 @@ const getContract = (provider) => {
   return Livemint;
 };
 
-const modifyMetadata = async (livemint, tokenId) => {
+const modifyMetadata = async (livemint, tokenId, imageUri) => {
   console.log("modifying metadata for tokenId", tokenId);
-  const tx = await livemint.setMetadata(tokenId, {
+  const tx = await livemint.setTokenURI(tokenId, imageUri, {
     gasLimit: 10000000,
   });
   console.log("submitting tx", tx.hash);
@@ -66,6 +69,20 @@ const main = async () => {
 
   const db = clientMongo.db(dbName);
   const collection = db.collection(collectionName);
+
+  const pinata = new pinataSDK(pinataApiKey, pinataApiSecret);
+
+  const pinToPinata = async (imageUri) => {
+    const metadata = {
+      name: "Eden Livemint",
+      description: "This is an NFT from Eden Livemint",
+      image: imageUri,
+      thumbnail: imageUri,
+      external_url: "https://app.eden.art",
+    };
+    const pinataUrl = await pinata.pinJSONToIPFS(metadata);
+    return `https://gateway.pinata.cloud/ipfs/${pinataUrl.IpfsHash}`;
+  };
 
   const failureUpdate = async (taskId) => {
     const filter = { taskId: taskId };
@@ -102,7 +119,12 @@ const main = async () => {
           const imageUri = creation.uri;
           const tokenId = mints[idx].tokenId;
           console.log("For tokenId", tokenId, "imageUri is", imageUri);
-          const txSuccess = await modifyMetadata(Livemint, tokenId);
+          const metadataUri = await pinToPinata(imageUri);
+          const txSuccess = await modifyMetadata(
+            Livemint,
+            tokenId,
+            metadataUri
+          );
           console.log(task.taskId, txSuccess, imageUri);
           await txUpdate(task.taskId, txSuccess, imageUri);
         }

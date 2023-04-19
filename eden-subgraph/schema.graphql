@@ -7,7 +7,7 @@ type LivemintToken @entity {
 
 type MintEvent @entity {
   id: Bytes!
-  timestamp: BigInt!
+  block: BigInt!
   txHash: Bytes!
 
   caller: Bytes!
@@ -16,7 +16,7 @@ type MintEvent @entity {
 
 type MetadataUpdateEvent @entity {
   id: Bytes!
-  timestamp: BigInt!
+  block: BigInt!
   txHash: Bytes!
 
   caller: Bytes!

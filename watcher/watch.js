@@ -19,7 +19,7 @@ const buildQuery = () => {
     query {
       mintEvents (where: { _change_block: { number_gte: ${startBlock} } }) {
         id
-        timestamp
+        block
         txHash
         caller
         tokenId
@@ -54,7 +54,7 @@ const main = async () => {
         newMintEvents.forEach(async (mintEvent) => {
           console.log(`- MintEvent with ID: ${mintEvent.id}`);
           console.log(`  tokenId: ${mintEvent.tokenId}`);
-          console.log(`  timestamp: ${mintEvent.timestamp}`);
+          console.log(`  block: ${mintEvent.block}`);
           console.log(`  txHash: ${mintEvent.txHash}`);
           console.log(`  caller: ${mintEvent.caller}`);
           mintEvent.ack = false;
@@ -71,9 +71,9 @@ const main = async () => {
 
         // Update startBlock
         const mostRecentMintEvent = newMintEvents.reduce((a, b) =>
-          Number(a.timestamp) > Number(b.timestamp) ? a : b
+          Number(a.block) > Number(b.block) ? a : b
         );
-        startBlock = Number(mostRecentMintEvent.timestamp) + 1;
+        startBlock = Number(mostRecentMintEvent.block) + 1;
         console.log("Updated startBlock:", startBlock);
       } else {
         console.log("No new MintEvent found.");
