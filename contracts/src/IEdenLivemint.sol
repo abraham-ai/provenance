@@ -7,5 +7,5 @@ interface IEdenLivemint {
 
     function mint() external;
     function setMetadataModifierAddress(address _metadataModifierAddress) external;
-    function setMetadata(uint256 _tokenId) external;
+    function setTokenURI(uint256 _tokenId, string memory _metadata) external;
 }

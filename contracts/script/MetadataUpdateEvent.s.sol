@@ -21,7 +21,7 @@ contract MetadataUpdateEvent is Script {
 
     function run() public {
         vm.startBroadcast(deployer);
-        _edenLivemint.setMetadata(0);
+        _edenLivemint.setTokenURI(0, "https://gateway.pinata.cloud/ipfs/QmQfGTzvFexjWYmyEWx6phoquTkgWm3ka1Pv7gcghhToUc");
         vm.stopBroadcast();
     }
 }
