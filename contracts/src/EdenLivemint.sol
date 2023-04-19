@@ -28,7 +28,6 @@ contract EdenLivemint is IEdenLivemint, ERC721, ERC721URIStorage, Ownable {
     function mint() public {
         _safeMint(msg.sender, currentTokenId);
         emit Mint(msg.sender, currentTokenId);
-        _setTokenURI(currentTokenId, baseURI);
         currentTokenId++;
     }
 
@@ -45,7 +44,11 @@ contract EdenLivemint is IEdenLivemint, ERC721, ERC721URIStorage, Ownable {
     }
 
     function tokenURI(uint256 _tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
-        return super.tokenURI(_tokenId);
+        if (metadataModified[_tokenId]) {
+            return super.tokenURI(_tokenId);
+        } else {
+            return baseURI;
+        }
     }
 
     function _burn(uint256 _tokenId) internal override(ERC721, ERC721URIStorage) {
