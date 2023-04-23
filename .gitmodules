@@ -10,3 +10,6 @@
 [submodule "contracts/lib/openzeppelin-contracts"]
 	path = contracts/lib/openzeppelin-contracts
 	url = https://github.com/openzeppelin/openzeppelin-contracts
+[submodule "contracts/lib/murky"]
+	path = contracts/lib/murky
+	url = https://github.com/dmfxyz/murky
