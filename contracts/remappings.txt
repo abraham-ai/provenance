@@ -5,3 +5,4 @@ forge-std/=lib/forge-std/src/
 prb-math/=lib/prb-math/src/
 prb-test/=lib/prb-test/src/
 src/=src/
+murky/=lib/murky/src/

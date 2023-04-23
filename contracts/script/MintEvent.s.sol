@@ -9,6 +9,7 @@ contract MintEvent is Script {
     address internal deployer;
     address internal _edenLivemintAddress = vm.envAddress("EDEN_LIVEMINT_ADDRESS");
     EdenLivemint internal _edenLivemint;
+    Merkle m = new Merkle();
 
     constructor() {
         setUp();
@@ -21,8 +22,11 @@ contract MintEvent is Script {
     }
 
     function run() public {
+        bytes32[] memory allowlist = new bytes32[](1);
+        allowlist[0] = keccak256(abi.encodePacked(deployer));
+        bytes32[] memory proof = m.getProof(allowlist, 0);
         vm.startBroadcast(deployer);
-        _edenLivemint.mint();
+        _edenLivemint.mint(proof);
         vm.stopBroadcast();
     }
 }

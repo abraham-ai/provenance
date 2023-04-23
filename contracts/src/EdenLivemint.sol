@@ -6,13 +6,15 @@ import { ERC721URIStorage } from "@openzeppelin/contracts/token/ERC721/extension
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { IEdenLivemint } from "./IEdenLivemint.sol";
-import { console2 } from "forge-std/console2.sol";
+import { Merkle } from "murky/Merkle.sol";
+
 
 contract EdenLivemint is IEdenLivemint, ERC721, ERC721URIStorage, Ownable {
     address public metadataModifierAddress;
     string public baseURI;
     uint256 public currentTokenId;
     mapping (uint256 => bool) public metadataModified;
+    Merkle m = new Merkle();
     bytes32 public merkleRoot;
 
     constructor(string memory _name, string memory _symbol, address _metadataModifierAddress, string memory _myBaseURI, bytes32 _merkleRoot) ERC721(_name, _symbol) {
@@ -32,15 +34,11 @@ contract EdenLivemint is IEdenLivemint, ERC721, ERC721URIStorage, Ownable {
         view
         returns (bool)
     {
-        return MerkleProof.verify(
-            _proof,
-            merkleRoot,
-            keccak256(abi.encodePacked(_wallet))
-        );
+        return m.verifyProof(merkleRoot, _proof, keccak256(abi.encodePacked(_wallet)));
     }
 
-    function mint(bytes32[] _proof) public {
-        require(allowListed(msg.sender, _proof), "You are not on the allowlist");
+    function mint(bytes32[] calldata _proof) public {
+        require(allowListed(msg.sender, _proof), "EdenLivemint: caller is not allowlisted");
         _safeMint(msg.sender, currentTokenId);
         emit Mint(msg.sender, currentTokenId);
         currentTokenId++;
