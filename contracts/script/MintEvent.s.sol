@@ -3,6 +3,7 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import { Script } from "forge-std/Script.sol";
 import { EdenLivemint } from "../src/EdenLivemint.sol";
+import { Merkle } from "murky/Merkle.sol";
 
 contract MintEvent is Script {
     address internal deployer;

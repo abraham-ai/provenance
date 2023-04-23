@@ -8,6 +8,7 @@ contract Deploy is Script {
     address internal deployer;
     address internal metadataModifier = vm.envAddress("METADATA_MODIFIER");
     string internal _baseURI = "https://gateway.pinata.cloud/ipfs/Qmde91C6FZNdumShjuhH9G2UeJkfoYqEuNgesW8EErUsgZ/";
+    bytes32 internal _merkleRoot = vm.envBytes("MERKLE_ROOT");
     EdenLivemint internal _edenLivemint;
 
     function setUp() public virtual {
@@ -17,7 +18,7 @@ contract Deploy is Script {
 
     function run() public {
         vm.startBroadcast(deployer);
-        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", metadataModifier, _baseURI);
+        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", metadataModifier, _baseURI, _merkleRoot);
         vm.stopBroadcast();
     }
 }

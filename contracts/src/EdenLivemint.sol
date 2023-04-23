@@ -13,10 +13,12 @@ contract EdenLivemint is IEdenLivemint, ERC721, ERC721URIStorage, Ownable {
     string public baseURI;
     uint256 public currentTokenId;
     mapping (uint256 => bool) public metadataModified;
+    bytes32 public merkleRoot;
 
-    constructor(string memory _name, string memory _symbol, address _metadataModifierAddress, string memory _myBaseURI) ERC721(_name, _symbol) {
+    constructor(string memory _name, string memory _symbol, address _metadataModifierAddress, string memory _myBaseURI, bytes32 _merkleRoot) ERC721(_name, _symbol) {
         metadataModifierAddress = _metadataModifierAddress;
         baseURI = _myBaseURI;
+        merkleRoot = _merkleRoot;
         currentTokenId = 0;
     }
 
@@ -25,7 +27,20 @@ contract EdenLivemint is IEdenLivemint, ERC721, ERC721URIStorage, Ownable {
         _;
     }
 
-    function mint() public {
+    function allowListed(address _wallet, bytes32[] calldata _proof)
+        public
+        view
+        returns (bool)
+    {
+        return MerkleProof.verify(
+            _proof,
+            merkleRoot,
+            keccak256(abi.encodePacked(_wallet))
+        );
+    }
+
+    function mint(bytes32[] _proof) public {
+        require(allowListed(msg.sender, _proof), "You are not on the allowlist");
         _safeMint(msg.sender, currentTokenId);
         emit Mint(msg.sender, currentTokenId);
         currentTokenId++;

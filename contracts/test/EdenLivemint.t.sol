@@ -11,6 +11,7 @@ contract EdenLivemintTest is PRBTest, StdCheats {
     address internal _owner = address(bytes20(keccak256("ownerd")));
     address internal _metadataModifierAddress = address(bytes20(keccak256("metadataModifierAddress")));
     address internal _minter = address(bytes20(keccak256("minter")));
+    console2.log(_minter);
     string internal _baseURI = "https://gateway.pinata.cloud/ipfs/QmQfGTzvFexjWYmyEWx6phoquTkgWm3ka1Pv7gcghhToUc";
     string internal _modifiedURI = "https://gateway.pinata.cloud/ipfs/QmQfGTzvFexjWYmyEWx6phoquTkgWm3ka1Pv7gcghhToUd";
 
