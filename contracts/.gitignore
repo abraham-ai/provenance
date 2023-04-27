@@ -5,6 +5,7 @@ out
 
 # files
 *.env
+.env.goerli
 *.log
 .DS_Store
 .pnp.*

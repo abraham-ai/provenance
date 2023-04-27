@@ -20,7 +20,6 @@
     "solidity",
     "template"
   ],
-  "private": true,
   "scripts": {
     "clean": "rimraf cache out",
     "lint": "pnpm lint:sol && pnpm prettier:check",
@@ -29,7 +28,7 @@
     "prettier:write": "prettier --write \"**/*.{json,md,yml}\"",
     "merkleroot": "node script/merkleroot.js",
     "deploy-local": "source .env && forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8547 --interactives 1 --sender=$SENDER_ADDRESS",
-    "deploy-goerli": "source .env && forge script script/Deploy.s.sol --rpc-url $RPC_PROVIDER_URL_GOERLI --broadcast --verify --etherscan-api-key $API_KEY_ETHERSCAN --interactives 1 --sender $SENDER_ADDRESS --optimize --optimizer-runs 200 -vvv"
+    "deploy-goerli": "source .env.goerli && forge script script/Deploy.s.sol --rpc-url $RPC_PROVIDER_URL_GOERLI --broadcast --verify --etherscan-api-key $API_KEY_ETHERSCAN --interactives 1 --sender $SENDER_ADDRESS --optimize --optimizer-runs 200 -vvv"
   },
   "dependencies": {
     "ethers": "^6.3.0",

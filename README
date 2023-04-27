@@ -1,4 +1,4 @@
-# Setup
+# Local Setup
 
 ## Install Rust, Foundry, Forge
 
@@ -27,12 +27,22 @@ docker compose up
 
 There should now be a local `anvil` blockchain running on localhost:8547, and a local graph node.
 
+## Generate Merkle Root
+
+To generate the merkle root for the allowlist, make a file called `allowlist.txt`, add the addresses you want to allowlist, separated by newlines, then run
+
+```
+pnpm merkleroot
+```
+
+Copy the output shown in the terminal to the env file.
+
 ## Deploy Contracts To Local Blockchain
 
 ```
 cd contracts
 cp .env.example .env
-forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8547
+pnpm deploy-local
 ```
 
 ## Deploy Local Subgraph
@@ -84,3 +94,55 @@ yarn dev
 ```
 
 Navigate to http://localhost:3000. There should already be a wallet connected. Click 'Claim Token'. If all goes well, the token should be minted, the mint is written to the subgraph, the watcher writes the mint to the db, and the modifier will update the metadata.
+
+# Deploying to Testnet (Goerli)
+
+## Deploy the contracts
+
+First, fill out the environmental variables you want to use for Goerli.
+
+```
+cp .env.example .env.goerli
+```
+
+Make sure you have followed the steps above in `Generate Merkle Root` to configure your allowlist.
+
+Now run:
+
+```
+cd contracts
+pnpm deploy-goerli
+```
+
+You will be asked to paste the private key of the address you chose as `SENDER_ADDRESS` in the env file. If all goes well, the contracts will be deployed and verified.
+
+## Deploy the Subgraph
+
+If it is your first time deploying the subgraph, navigate to:
+
+https://thegraph.com/studio/
+
+Connect your wallet and create a subgraph named `eden-livemint-dev.
+
+Now, run the following:
+
+```
+npm install -g @graphprotocol/graph-cli
+graph auth --studio [YOUR DEPLOY KEY HERE]
+```
+
+Now you are authenticated to deploy your subgraph to testnet.
+
+```
+cd eden-subgraph
+yarn refresh-local && yarn prep 5 && yarn deploy-goerli
+```
+
+## Publish the contracts package to NPM
+
+```
+cd contracts
+npm publish
+```
+
+Then update the dependencies to use the new package name anywhere that depends on it.

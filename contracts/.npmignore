@@ -6,5 +6,5 @@
 !/out/EdenLivemint.sol/EdenLivemint.json
 
 # Allow everything in /contracts ...
-!/contracts/**
+!/src/**
 /foundry.toml
