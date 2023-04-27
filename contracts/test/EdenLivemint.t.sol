@@ -7,7 +7,6 @@ import { StdCheats } from "forge-std/StdCheats.sol";
 import { EdenLivemint } from "../src/EdenLivemint.sol";
 import { Merkle } from "murky/Merkle.sol";
 
-
 contract EdenLivemintTest is PRBTest, StdCheats {
     EdenLivemint internal _edenLivemint;
     address internal _owner = address(bytes20(keccak256("ownerd")));
@@ -33,7 +32,7 @@ contract EdenLivemintTest is PRBTest, StdCheats {
         allowlistData[0] = keccak256(abi.encodePacked(_minter));
         allowlistData[1] = keccak256(abi.encodePacked(_owner));
         bytes32 root = m.getRoot(allowlistData);
-        
+
         vm.prank(_owner);
         _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", _metadataModifierAddress, _baseURI, root);
     }
@@ -61,14 +60,12 @@ contract EdenLivemintTest is PRBTest, StdCheats {
 
     function testRandomCannotSetMetadataModifierAddress() public {
         vm.prank(_minter);
-        vm.expectRevert(
-            "Ownable: caller is not the owner"
-        );
+        vm.expectRevert("Ownable: caller is not the owner");
         _edenLivemint.setMetadataModifierAddress(_owner);
     }
 
     function testSetTokenURI() public {
-        mintWithProof();    
+        mintWithProof();
         vm.prank(_metadataModifierAddress);
         _edenLivemint.setTokenURI(0, _modifiedURI);
         assertEq(_edenLivemint.tokenURI(0), _modifiedURI);
@@ -77,9 +74,7 @@ contract EdenLivemintTest is PRBTest, StdCheats {
     function testRandomCannotSetTokenURI() public {
         mintWithProof();
         vm.prank(_minter);
-        vm.expectRevert(
-            "EdenLivemint: caller is not the metadata modifier"
-        );
+        vm.expectRevert("EdenLivemint: caller is not the metadata modifier");
         _edenLivemint.setTokenURI(0, _modifiedURI);
     }
 
@@ -91,9 +86,7 @@ contract EdenLivemintTest is PRBTest, StdCheats {
         assertEq(_edenLivemint.tokenURI(0), _modifiedURI);
 
         vm.prank(_metadataModifierAddress);
-        vm.expectRevert(
-            "EdenLivemint: metadata already modified"
-        );
+        vm.expectRevert("EdenLivemint: metadata already modified");
         _edenLivemint.setTokenURI(0, _modifiedURI);
     }
 
@@ -101,18 +94,14 @@ contract EdenLivemintTest is PRBTest, StdCheats {
         mintWithProof();
 
         vm.prank(_metadataModifierAddress);
-        vm.expectRevert(
-            "EdenLivemint: token does not exist"
-        );
+        vm.expectRevert("EdenLivemint: token does not exist");
         _edenLivemint.setTokenURI(100, _modifiedURI);
     }
 
     function testNonAllowlistedAddressCannotMint() public {
         bytes32[] memory proof = m.getProof(allowlistData, 0);
         vm.prank(_nonAllowlisted);
-        vm.expectRevert(
-            "EdenLivemint: caller is not allowlisted"
-        );
+        vm.expectRevert("EdenLivemint: caller is not allowlisted");
         _edenLivemint.mint(proof);
     }
 }

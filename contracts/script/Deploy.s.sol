@@ -5,19 +5,13 @@ import { Script } from "forge-std/Script.sol";
 import { EdenLivemint } from "../src/EdenLivemint.sol";
 
 contract Deploy is Script {
-    address internal deployer;
     address internal metadataModifier = vm.envAddress("METADATA_MODIFIER");
-    string internal _baseURI = "https://gateway.pinata.cloud/ipfs/Qmde91C6FZNdumShjuhH9G2UeJkfoYqEuNgesW8EErUsgZ/";
-    bytes32 internal _merkleRoot = keccak256(abi.encodePacked(vm.envString("MERKLE_ROOT")));
+    string internal _baseURI = vm.envString("BASE_URI");
+    bytes32 internal _merkleRoot = vm.envBytes32("MERKLE_ROOT");
     EdenLivemint internal _edenLivemint;
 
-    function setUp() public virtual {
-        string memory mnemonic = vm.envString("MNEMONIC");
-        (deployer, ) = deriveRememberKey(mnemonic, 0);
-    }
-
     function run() public {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast();
         _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", metadataModifier, _baseURI, _merkleRoot);
         vm.stopBroadcast();
     }

@@ -8,16 +8,23 @@ import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { IEdenLivemint } from "./IEdenLivemint.sol";
 import { Merkle } from "murky/Merkle.sol";
 
-
 contract EdenLivemint is IEdenLivemint, ERC721, ERC721URIStorage, Ownable {
     address public metadataModifierAddress;
     string public baseURI;
     uint256 public currentTokenId;
-    mapping (uint256 => bool) public metadataModified;
+    mapping(uint256 => bool) public metadataModified;
     Merkle m = new Merkle();
     bytes32 public merkleRoot;
 
-    constructor(string memory _name, string memory _symbol, address _metadataModifierAddress, string memory _myBaseURI, bytes32 _merkleRoot) ERC721(_name, _symbol) {
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        address _metadataModifierAddress,
+        string memory _myBaseURI,
+        bytes32 _merkleRoot
+    )
+        ERC721(_name, _symbol)
+    {
         metadataModifierAddress = _metadataModifierAddress;
         baseURI = _myBaseURI;
         merkleRoot = _merkleRoot;
@@ -29,11 +36,7 @@ contract EdenLivemint is IEdenLivemint, ERC721, ERC721URIStorage, Ownable {
         _;
     }
 
-    function allowListed(address _wallet, bytes32[] calldata _proof)
-        public
-        view
-        returns (bool)
-    {
+    function allowListed(address _wallet, bytes32[] calldata _proof) public view returns (bool) {
         return m.verifyProof(merkleRoot, _proof, keccak256(abi.encodePacked(_wallet)));
     }
 

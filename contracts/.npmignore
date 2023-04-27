@@ -1,0 +1,10 @@
+# Ignore everything by default.
+*
+
+# Allow deployment ABIs and broadcasts
+!/broadcast/Deploy.s.sol/5/run-latest.json
+!/out/EdenLivemint.sol/EdenLivemint.json
+
+# Allow everything in /contracts ...
+!/contracts/**
+/foundry.toml

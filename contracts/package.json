@@ -1,10 +1,10 @@
 {
-  "name": "@prb/foundry-template",
-  "description": "Foundry-based template for developing Solidity smart contracts",
+  "name": "eden-livemint",
+  "description": "Smart contracts for Eden Livemint project",
   "version": "1.0.0",
   "author": {
-    "name": "Paul Razvan Berg",
-    "url": "https://github.com/paulrberg"
+    "name": "Jonathan Miller",
+    "url": "https://github.com/abraham-ai"
   },
   "devDependencies": {
     "prettier": "^2.8.4",
@@ -26,6 +26,13 @@
     "lint": "pnpm lint:sol && pnpm prettier:check",
     "lint:sol": "forge fmt --check && pnpm solhint \"{script,src,test}/**/*.sol\"",
     "prettier:check": "prettier --check \"**/*.{json,md,yml}\"",
-    "prettier:write": "prettier --write \"**/*.{json,md,yml}\""
+    "prettier:write": "prettier --write \"**/*.{json,md,yml}\"",
+    "merkleroot": "node script/merkleroot.js",
+    "deploy-local": "source .env && forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8547 --interactives 1 --sender=$SENDER_ADDRESS",
+    "deploy-goerli": "source .env && forge script script/Deploy.s.sol --rpc-url $RPC_PROVIDER_URL_GOERLI --broadcast --verify --etherscan-api-key $API_KEY_ETHERSCAN --interactives 1 --sender $SENDER_ADDRESS --optimize --optimizer-runs 200 -vvv"
+  },
+  "dependencies": {
+    "ethers": "^6.3.0",
+    "merkletreejs": "^0.3.10"
   }
 }

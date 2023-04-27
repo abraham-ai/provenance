@@ -1,13 +1,8 @@
-import { BigNumber } from "ethers";
-import { formatEther } from "ethers/lib/utils.js";
-import React, { useEffect } from "react";
+import React from "react";
 import { useWaitForTransaction } from "wagmi";
 import useMint from "../hooks/useMint";
 
 const Balance = () => {
-  const [balance, setBalance] = React.useState<BigNumber | undefined>(
-    undefined
-  );
   const { data, write } = useMint();
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,

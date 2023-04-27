@@ -1,5 +1,5 @@
-import EdenLivemintContract from "../../../contracts/out/EdenLivemint.sol/EdenLivemint.json";
-import Broadcast from "../../../contracts/broadcast/Deploy.s.sol/1337/run-latest.json";
+import EdenLivemintContract from "eden-livemint/out/EdenLivemint.sol/EdenLivemint.json";
+import Broadcast from "eden-livemint/broadcast/Deploy.s.sol/1337/run-latest.json";
 
 const getContractAddress = (contractName: string) => {
   const contract = Broadcast.transactions.find(

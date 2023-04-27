@@ -15,7 +15,7 @@ contract MetadataUpdateEvent is Script {
 
     function setUp() public virtual {
         string memory mnemonic = vm.envString("MNEMONIC");
-        (deployer, ) = deriveRememberKey(mnemonic, 0);
+        (deployer,) = deriveRememberKey(mnemonic, 0);
         _edenLivemint = EdenLivemint(_edenLivemintAddress);
     }
 
