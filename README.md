@@ -1,12 +1,6 @@
 # Local Setup
 
-## Install Rust, Foundry, Forge
-
-https://book.getfoundry.sh/getting-started/installation
-
-## Contracts
-
-Installation:
+## Install Rust, [Foundry](https://book.getfoundry.sh/getting-started/installation), Forge
 
 ```
 cd contracts
@@ -16,7 +10,9 @@ forge install
 forge test
 ```
 
-## Graph Node
+## Setup graph node
+
+From root of provenance:
 
 ```
 git clone https://github.com/abraham-ai/graph-node.git
@@ -29,19 +25,20 @@ There should now be a local `anvil` blockchain running on localhost:8547, and a 
 
 ## Generate Merkle Root
 
-To generate the merkle root for the allowlist, make a file called `allowlist.txt`, add the addresses you want to allowlist, separated by newlines, then run
+To generate the merkle root for the allowlist, make a file called `allowlist.txt` in `/contracts`, add the addresses you want to allowlist, separated by newlines, then run:
 
 ```
 pnpm merkleroot
 ```
 
-Copy the output shown in the terminal to the env file.
+Copy the output shown in the terminal to `/contracts/.env`.
 
 ## Deploy Contracts To Local Blockchain
 
+Setup .env, then run:
+
 ```
 cd contracts
-cp .env.example .env
 pnpm deploy-local
 ```
 
@@ -53,39 +50,35 @@ yarn
 yarn refresh-local && yarn prep 1337 && yarn create-local && yarn deploy-local
 ```
 
-Now, navigate to http://localhost:8000/subgraphs/name/eden-subgraph-local/graphql?query=query+%7B%0A++mintEvents+%7B%0A++++id%0A++%7D%0A%7D
+Subgraph will be available [here](http://localhost:8000/subgraphs/name/eden-subgraph-local/graphql?query=query+%7B%0A++mintEvents+%7B%0A++++id%0A++%7D%0A%7D).
 
 ## Start Mongo
+
+This is optional, as you can just use Eden API's own Mongo. If you want a local one for testing run:
+
 ```
+cd eden-subgraph
 docker compose up
 ```
 
 ## Start Watcher scripts
 
-```
-cp .env.example .env
-```
-
-Fill out the appropriate values in the env file
+Setup the .env file.
 
 ```
 cd watcher
 pnpm i
 node watch.js
-node modiify.js
+node modify.js
 ```
 
-The watcher script queries the subgraph every so often to look for new mint events and writes them to db
+The watcher script queries the subgraph every so often to look for new mint events and writes them to db.
 
 The modify script queries the db for unacknowledged mint events, and updates their token URI with a backend signer.
 
 ## Start the Frontend
 
-```
-cp .env.example .env
-```
-
-Fill out the appropriate values in the env file
+Fill out the appropriate values in the .env file
 
 ```
 cd frontend
@@ -93,7 +86,9 @@ yarn
 yarn dev
 ```
 
-Navigate to http://localhost:3000. There should already be a wallet connected. Click 'Claim Token'. If all goes well, the token should be minted, the mint is written to the subgraph, the watcher writes the mint to the db, and the modifier will update the metadata.
+Navigate to [http://localhost:3000](http://localhost:3000). There should already be a wallet connected. Click 'Claim Token'. If all goes well, the token should be minted, the mint is written to the subgraph, the watcher writes the mint to the db, and the modifier will update the metadata.
+
+----
 
 # Deploying to Testnet (Goerli)
 
