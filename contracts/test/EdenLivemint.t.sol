@@ -34,7 +34,7 @@ contract EdenLivemintTest is PRBTest, StdCheats {
         bytes32 root = m.getRoot(allowlistData);
 
         vm.prank(_owner);
-        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", _metadataModifierAddress, _baseURI, root);
+        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", _metadataModifierAddress, _baseURI, true, root);
     }
 
     function mintWithProof() public {

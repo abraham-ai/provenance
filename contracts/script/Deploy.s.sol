@@ -8,11 +8,12 @@ contract Deploy is Script {
     address internal metadataModifier = vm.envAddress("METADATA_MODIFIER");
     string internal _baseURI = vm.envString("BASE_URI");
     bytes32 internal _merkleRoot = vm.envBytes32("MERKLE_ROOT");
+    bool internal _allowListActive = vm.envBool("ALLOW_LIST_ACTIVE");
     EdenLivemint internal _edenLivemint;
 
     function run() public {
         vm.startBroadcast();
-        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", metadataModifier, _baseURI, _merkleRoot);
+        _edenLivemint = new EdenLivemint("EdenLivemint", "EDEN", metadataModifier, _baseURI, _allowListActive, _merkleRoot);
         vm.stopBroadcast();
     }
 }
