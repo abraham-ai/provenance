@@ -40,6 +40,7 @@ Setup .env
 * `SENDER_ADDRESS`: public address of the account deploying the contract
 * `METADATA_MODIFIER`: public address of the account authorized to modify the metadata (can be same as `SENDER_ADDRESS`)
 * `MERKLE_ROOT`: from previous step, merkle root of allow list.
+* `ALLOW_LIST_ACTIVE`: boolean whether to require merkle root for allowlist.
 * `BASE_URI`: a placeholder token URI for all new tokens that don't have successful eden jobs yet.
 * `EDEN_LIVEMINT_ADDRESS`: address of the deployed contract (after its been deployed), mainly for testing the watcher/modifier. On Anvil, it's always the same.
 
