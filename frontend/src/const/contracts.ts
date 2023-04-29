@@ -12,7 +12,7 @@ const getContractAddress = (contractName: string) => {
 };
 
 export const contracts = {
-  HiLoToken: {
+  LiveMint: {
     address: getContractAddress("EdenLivemint"),
     abi: EdenLivemintContract.abi,
   },
