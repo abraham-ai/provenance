@@ -47,30 +47,46 @@ const main = async () => {
       const response = await axios.post(gqlEndpoint, { query });
       console.log(response.data);
 
-      const newMintEvents = response.data.data.mintEvents;
+      const mintEvents = response.data.data.mintEvents;
 
-      if (newMintEvents.length > 0) {
+      if (mintEvents.length > 0) {
         console.log("New MintEvent(s) found:");
-        newMintEvents.forEach(async (mintEvent) => {
-          console.log(`- MintEvent with ID: ${mintEvent.id}`);
-          console.log(`  tokenId: ${mintEvent.tokenId}`);
+        mintEvents.forEach(async (mintEvent) => {
+
+          delete mintEvent.id;
+          console.log(`- MintEvent with token ID: ${mintEvent.tokenId}`);
           console.log(`  block: ${mintEvent.block}`);
           console.log(`  txHash: ${mintEvent.txHash}`);
           console.log(`  caller: ${mintEvent.caller}`);
-          mintEvent.ack = false;
 
+          // Check if mintEvent already saved
+          const livemintEvent = await collection.findOne(mintEvent);
+          if (livemintEvent) {
+            console.log(`= mintEvent ${mintEvent.tokenId} already saved`);
+            return;
+          }
+
+          // Create Eden task
           const edenConfig = {
-            text_input: "Cyberpunk NFT",
+            text_input: "Abraham comes alive",
           };
           const result = await edenClient.startTask("create", edenConfig);
-          console.log("eden task id: ", result.taskId);
-          mintEvent.taskId = result.taskId;
+
+          if (result.error) {
+            console.log("error", result.error);
+            mintEvent.edenSuccess = false;
+          } 
+          else if (result.taskId) {
+            mintEvent.taskId = result.taskId;
+          }
+
+          mintEvent.ack = false;
 
           await collection.insertOne(mintEvent);
         });
 
         // Update startBlock
-        const mostRecentMintEvent = newMintEvents.reduce((a, b) =>
+        const mostRecentMintEvent = mintEvents.reduce((a, b) =>
           Number(a.block) > Number(b.block) ? a : b
         );
         startBlock = Number(mostRecentMintEvent.block) + 1;

@@ -39,7 +39,6 @@ const getContract = (provider) => {
     LivemintAbi.abi,
     signer
   );
-
   return Livemint;
 };
 
@@ -50,10 +49,25 @@ const modifyMetadata = async (livemint, tokenId, imageUri) => {
   });
   console.log("submitting tx", tx.hash);
   const receipt = await tx.wait();
-  const isSuccess = receipt.status === 1;
-  console.log("tx success", isSuccess);
-  return isSuccess;
+  console.log(receipt);
+  // if (receipt.status === 0) {
+  //   console.log("Transaction failed:", receipt.transactionHash);
+  //   const reason = await provider.getTransactionReceipt(receipt.transactionHash)
+  //     .then((txReceipt) => {
+  //       const logs = livemint.interface.parseLog(txReceipt.logs[0]);
+  //       return logs.args[1];
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error getting transaction receipt:", err);
+  //       return "Unknown reason";
+  //     });
+  //   console.log("Reason:", reason);
+  //   return false;
+  // }
+  console.log(`tx success == ${receipt.status}`);
+  return receipt.status;
 };
+
 
 const main = async () => {
   const PROVIDER_URL = process.env.PROVIDER_URL;
@@ -84,13 +98,6 @@ const main = async () => {
     return `https://gateway.pinata.cloud/ipfs/${pinataUrl.IpfsHash}`;
   };
 
-  const failureUpdate = async (taskId) => {
-    const filter = { taskId: taskId };
-    const update = { $set: { ack: true, edenSuccess: false } };
-    const options = { upsert: true };
-    await collection.updateMany(filter, update, options);
-  };
-
   const txUpdate = async (taskId, txSuccess, imageUri) => {
     const filter = { taskId: taskId };
     const update = {
@@ -109,27 +116,37 @@ const main = async () => {
     const taskIds = mints.map((mintEvent) => mintEvent.taskId);
     try {
       const { tasks } = await edenClient.getTasks({ taskIds: taskIds });
-      let creationIds = [];
       tasks.forEach(async (task, idx) => {
         if (task.status === "failed") {
-          await failureUpdate(task.taskId);
+          const filter = { taskId: taskId };
+          const update = { $set: { ack: true, edenSuccess: false } };
+          const options = { upsert: true };
+          await collection.updateMany(filter, update, options);
         }
         if (task.status === "completed") {
           const creation = await edenClient.getCreation(task.creation);
           const imageUri = creation.uri;
           const tokenId = mints[idx].tokenId;
-          console.log("For tokenId", tokenId, "imageUri is", imageUri);
           const metadataUri = await pinToPinata(imageUri);
           const txSuccess = await modifyMetadata(
             Livemint,
             tokenId,
             metadataUri
           );
-          console.log(task.taskId, txSuccess, imageUri);
-          await txUpdate(task.taskId, txSuccess, imageUri);
+          const filter = { taskId: task.taskId };
+          const options = { upsert: true };
+          const update = {
+            $set: {
+              ack: true,
+              edenSuccess: true,
+              imageUri: imageUri,
+              txSuccess,
+            },
+          };
+          await collection.updateMany(filter, update, options);
         }
       });
-      return creationIds;
+      return;
     } catch (error) {
       console.error("Error fetching Eden results:", error);
       return;
