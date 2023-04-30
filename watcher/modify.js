@@ -1,4 +1,5 @@
 const { MongoClient } = require("mongodb");
+const axios = require('axios');
 const ethers = require("ethers");
 require("dotenv").config();
 const fs = require("fs");
@@ -127,7 +128,40 @@ const main = async () => {
           const creation = await edenClient.getCreation(task.creation);
           const imageUri = creation.uri;
           const tokenId = mints[idx].tokenId;
-          const metadataUri = await pinToPinata(imageUri);
+          
+          console.log(imageUri)
+          const filename = imageUri.split('/').slice(-1)[0];
+          const imageStream = await axios({
+            url: imageUri,
+            method: 'GET',
+            responseType: 'stream'
+          });
+          
+          console.log("got image stream")
+          const ipfsImage = await pinata.pinFileToIPFS(imageStream.data, {
+            pinataMetadata: {
+              name: filename
+            }
+          });
+          
+          const ipfsImageUri = `https://gateway.pinata.cloud/ipfs/${ipfsImage.IpfsHash}`
+          console.log("uploaded image to ", ipfsImageUri)
+
+          const metadata = {
+            name: "Eden Livemint",
+            description: "This is an NFT from Eden Livemint",
+            image: ipfsImageUri,
+            thumbnail: ipfsImageUri,
+            external_url: "https://app.eden.art",
+          };
+          const pinataUrl = await pinata.pinJSONToIPFS(metadata);
+          
+          const metadataUri = `https://gateway.pinata.cloud/ipfs/${pinataUrl.IpfsHash}`
+          
+          console.log("METADATA URI ====")
+          console.log(metadataUri)
+
+
           const txSuccess = await modifyMetadata(
             Livemint,
             tokenId,
